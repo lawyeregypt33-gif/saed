@@ -1,0 +1,8 @@
+{
+  "name": "SAED COMPLY",
+  "description": "Saudi HR Compliance & Violations Management System",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

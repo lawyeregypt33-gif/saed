@@ -1,0 +1,348 @@
+{
+  "entities": {
+    "Company": {
+      "title": "Company",
+      "description": "Establishment or subsidiary tracked for HRSD compliance",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Company legal trade name",
+          "maxLength": 200
+        },
+        "commercialRegistrationNumber": {
+          "type": "string",
+          "description": "Saudi CR number (10 digits)",
+          "maxLength": 20
+        },
+        "notes": {
+          "type": "string",
+          "description": "Compliance notes and remarks",
+          "maxLength": 2000
+        },
+        "isOfficial": {
+          "type": "boolean",
+          "description": "Whether this is an officially verified record or an initial placeholder"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Company operational status"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp"
+        }
+      },
+      "required": ["name", "active"]
+    },
+    "Violation": {
+      "title": "Violation",
+      "description": "HRSD violation record and tracking",
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string",
+          "description": "Associated company identifier",
+          "maxLength": 128
+        },
+        "companyName": {
+          "type": "string",
+          "description": "Associated company cached name",
+          "maxLength": 200
+        },
+        "establishmentName": {
+          "type": "string",
+          "description": "Establishment branch name",
+          "maxLength": 200
+        },
+        "branchName": {
+          "type": "string",
+          "description": "Branch code or physical location",
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "description": "Violation category under HRSD classification",
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "description": "Details of the compliance infraction",
+          "maxLength": 3000
+        },
+        "violationDate": {
+          "type": "string",
+          "description": "Date violation was recorded",
+          "maxLength": 30
+        },
+        "notificationDate": {
+          "type": "string",
+          "description": "Date notification received via Qiwa / HRSD",
+          "maxLength": 30
+        },
+        "decisionNumber": {
+          "type": "string",
+          "description": "Ministerial or administrative decision number",
+          "maxLength": 100
+        },
+        "fineAmount": {
+          "type": "number",
+          "description": "Monetary penalty amount in SAR"
+        },
+        "riskLevel": {
+          "type": "string",
+          "description": "Risk severity: Low, Medium, High, Critical",
+          "enum": ["Low", "Medium", "High", "Critical"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Compliance status",
+          "enum": [
+            "New",
+            "Under Review",
+            "Correction in Progress",
+            "Objection Preparation",
+            "Objection Submitted",
+            "Payment Pending",
+            "Paid",
+            "Closed"
+          ]
+        },
+        "assignedTo": {
+          "type": "string",
+          "description": "Assigned legal or compliance specialist",
+          "maxLength": 128
+        },
+        "deadline": {
+          "type": "string",
+          "description": "Legal objection or resolution deadline",
+          "maxLength": 30
+        },
+        "notes": {
+          "type": "string",
+          "description": "Case notes",
+          "maxLength": 3000
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "User ID who created the record",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Update timestamp"
+        }
+      },
+      "required": ["companyId", "category", "riskLevel", "status"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Action item and deadline linked to a violation",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Task summary",
+          "maxLength": 300
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Associated company identifier",
+          "maxLength": 128
+        },
+        "violationId": {
+          "type": "string",
+          "description": "Associated violation identifier",
+          "maxLength": 128
+        },
+        "assignedTo": {
+          "type": "string",
+          "description": "Assigned employee name or email",
+          "maxLength": 128
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Start date",
+          "maxLength": 30
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "Target completion date",
+          "maxLength": 30
+        },
+        "status": {
+          "type": "string",
+          "description": "Task status",
+          "enum": ["Pending", "In Progress", "Completed", "Cancelled"]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Task progress notes",
+          "maxLength": 2000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Update timestamp"
+        }
+      },
+      "required": ["title", "violationId", "dueDate", "status"]
+    },
+    "Document": {
+      "title": "Document",
+      "description": "Legal evidence, ministry notice, or objection memorandum",
+      "type": "object",
+      "properties": {
+        "fileName": {
+          "type": "string",
+          "description": "Original file name",
+          "maxLength": 300
+        },
+        "storagePath": {
+          "type": "string",
+          "description": "Firebase storage path or safe URI",
+          "maxLength": 1000
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Associated company identifier",
+          "maxLength": 128
+        },
+        "violationId": {
+          "type": "string",
+          "description": "Associated violation identifier",
+          "maxLength": 128
+        },
+        "uploadedBy": {
+          "type": "string",
+          "description": "Uploader email or name",
+          "maxLength": 128
+        },
+        "uploadedAt": {
+          "type": "string",
+          "description": "Upload timestamp"
+        },
+        "documentType": {
+          "type": "string",
+          "description": "Document format or extension",
+          "maxLength": 50
+        },
+        "fileSize": {
+          "type": "number",
+          "description": "File size in bytes"
+        }
+      },
+      "required": ["fileName", "uploadedBy", "uploadedAt"]
+    },
+    "User": {
+      "title": "User",
+      "description": "System user profile and compliance permissions",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "User full name",
+          "maxLength": 150
+        },
+        "email": {
+          "type": "string",
+          "description": "Official company email",
+          "maxLength": 150
+        },
+        "role": {
+          "type": "string",
+          "description": "Access level role",
+          "enum": ["Admin", "Legal Consultant", "Compliance Officer", "Viewer"]
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Account active flag"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["email", "role", "active"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable compliance activity history",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "User identifier who performed action",
+          "maxLength": 128
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 150
+        },
+        "action": {
+          "type": "string",
+          "description": "Logged system event",
+          "maxLength": 100
+        },
+        "recordId": {
+          "type": "string",
+          "description": "Affected entity identifier",
+          "maxLength": 128
+        },
+        "collection": {
+          "type": "string",
+          "description": "Target entity collection name",
+          "maxLength": 100
+        },
+        "details": {
+          "type": "string",
+          "description": "Summary of modifications or change payload",
+          "maxLength": 2000
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Event timestamp"
+        }
+      },
+      "required": ["userId", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/companies/{companyId}": {
+      "schema": { "$ref": "#/entities/Company" },
+      "description": "Tracked companies and subsidiaries"
+    },
+    "/violations/{violationId}": {
+      "schema": { "$ref": "#/entities/Violation" },
+      "description": "HRSD compliance violations"
+    },
+    "/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/Task" },
+      "description": "Action items and deadlines for violations"
+    },
+    "/documents/{documentId}": {
+      "schema": { "$ref": "#/entities/Document" },
+      "description": "Evidence and legal documents"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User RBAC profiles"
+    },
+    "/auditLogs/{auditLogId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Immutable audit trails for compliance governance"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'lawyeregypt33@gmail.com'
+      );
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function getUserRole() {
+      return isBootstrappedAdmin() ? 'Admin' : (
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) ? getUserData().role : 'Viewer'
+      );
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || getUserRole() == 'Admin';
+    }
+
+    function isLegalOrAbove() {
+      return isAdmin() || getUserRole() == 'Legal Consultant';
+    }
+
+    function isComplianceOrAbove() {
+      return isLegalOrAbove() || getUserRole() == 'Compliance Officer';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      // Allow user to write their own initial profile, or Admin to manage any profile
+      allow create: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Companies collection
+    match /companies/{companyId} {
+      allow read: if isSignedIn();
+      allow create, update: if isComplianceOrAbove();
+      allow delete: if isAdmin();
+    }
+
+    // Violations collection
+    match /violations/{violationId} {
+      allow read: if isSignedIn();
+      allow create, update: if isComplianceOrAbove();
+      allow delete: if isAdmin() || isLegalOrAbove();
+    }
+
+    // Tasks collection
+    match /tasks/{taskId} {
+      allow read: if isSignedIn();
+      allow create, update: if isComplianceOrAbove();
+      allow delete: if isAdmin() || isLegalOrAbove();
+    }
+
+    // Documents collection
+    match /documents/{documentId} {
+      allow read: if isSignedIn();
+      allow create, update: if isComplianceOrAbove();
+      allow delete: if isAdmin() || isLegalOrAbove();
+    }
+
+    // Audit logs - append only, never modified or deleted
+    match /auditLogs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+  }
+}
