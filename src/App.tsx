@@ -33,6 +33,7 @@ import {
   subscribeAuditLogs,
   subscribeUsers,
   seedInitialCompaniesIfEmpty,
+  seedSampleViolationsIfEmpty,
 } from './services/firestoreService';
 import { testConnection } from './firebase/config';
 import { isOverdue } from './utils/formatters';
@@ -96,6 +97,15 @@ function MainApp() {
       unsubUsers();
     };
   }, [currentUser]);
+
+  // Seed sample violations if companies are populated but violations collection is empty
+  useEffect(() => {
+    if (currentUser && companies.length > 0 && violations.length === 0) {
+      seedSampleViolationsIfEmpty(companies).catch((err) =>
+        console.warn('Violations seed check:', err)
+      );
+    }
+  }, [currentUser, companies, violations.length]);
 
   // Calculate count badges
   const openTasksCount = tasks.filter(

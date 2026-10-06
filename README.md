@@ -30,17 +30,17 @@
 
 ---
 
-## Firebase Configuration / إعداد فايربيس
-
+## Firebase Configuration & Hosting / إعداد فايربيس والاستضافة
+ 
 1. The application reads configuration from `firebase-applet-config.json` located at the root of the project:
    ```json
    {
-     "projectId": "YOUR_PROJECT_ID",
-     "appId": "YOUR_APP_ID",
-     "apiKey": "YOUR_API_KEY",
-     "authDomain": "YOUR_PROJECT_ID.firebaseapp.com",
-     "firestoreDatabaseId": "YOUR_FIRESTORE_DATABASE_ID",
-     "storageBucket": "YOUR_STORAGE_BUCKET"
+     "projectId": "hazel-observer-d8chg",
+     "appId": "1:183759670136:web:e925af2f51b023ddd9d68d",
+     "apiKey": "AIzaSyCiaVhD_XgH_wa0nKvbUKQ_-R5NQxltox4",
+     "authDomain": "hazel-observer-d8chg.firebaseapp.com",
+     "firestoreDatabaseId": "ai-studio-saedcomply-94870c73-8fcf-4727-a518-1a240ed0875d",
+     "storageBucket": "hazel-observer-d8chg.firebasestorage.app"
    }
    ```
 2. In Google AI Studio, Firebase is provisioned automatically with enterprise-grade Firestore and Firebase Authentication.
@@ -48,6 +48,21 @@
    ```bash
    firebase deploy --only firestore:rules
    ```
+4. Deploy to Firebase Hosting for production:
+   ```bash
+   npm run build
+   firebase deploy --only hosting
+   ```
+5. Custom Domain setup:
+   In Firebase Console -> Hosting -> "Add Custom Domain", enter your official corporate domain (e.g. `compliance.saed.com.sa`) and add the provided TXT/A DNS records.
+
+---
+
+## CI/CD Pipeline (GitHub Actions) / النشر التلقائي عبر جيت هب
+A pre-configured GitHub Actions workflow is included at `.github/workflows/firebase-deploy.yml`:
+* Triggers automatically on push to branch `main`.
+* Runs linting, type-checking (`npm run lint`), and production build (`npm run build`).
+* Deploys production bundle directly to Firebase Hosting using GitHub Secret `FIREBASE_SERVICE_ACCOUNT_HAZEL_OBSERVER_D8CHG`.
 
 ---
 

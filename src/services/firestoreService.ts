@@ -201,6 +201,105 @@ export async function seedInitialCompaniesIfEmpty(): Promise<number> {
   }
 }
 
+// Seed sample violations if collection is empty
+export async function seedSampleViolationsIfEmpty(companiesList: Company[]): Promise<number> {
+  const path = 'violations';
+  try {
+    const snap = await getDocs(collection(db, path));
+    if (!snap.empty) {
+      return 0;
+    }
+    if (!companiesList || companiesList.length === 0) {
+      return 0;
+    }
+
+    const c1 = companiesList[0];
+    const c2 = companiesList[1] || c1;
+    const now = new Date().toISOString();
+    const curYear = new Date().getFullYear();
+
+    const sampleViolations = [
+      {
+        violationCode: `VIO-${curYear}-001`,
+        companyId: c1.id || '',
+        companyName: c1.name,
+        establishmentName: `${c1.name} - المقر الرئيسي بالرياض`,
+        branchName: 'الفرع الرئيسي',
+        category: 'توطين وسعودة (نسب التوطين والمهن المقصورة)',
+        description: 'رصد عدم استيفاء نسبة التوطين المقررة للوظائف القيادية والإشرافية بموجب المادة 26 من نظام العمل',
+        violationDate: `${curYear}-02-15`,
+        notificationDate: `${curYear}-02-18`,
+        decisionNumber: `DEC-${curYear}-8891`,
+        fineAmount: 20000,
+        riskLevel: 'Critical' as const,
+        status: 'Objection Preparation' as const,
+        assignedTo: 'المستشار القانوني',
+        deadline: `${curYear}-03-20`,
+        deadlineVerified: true,
+        notes: 'تمت إحالة الملف للدراسة لإعداد مذكرة التظلم عبر منصة قوى قبل فوات المهلة النظامية',
+        createdBy: 'system',
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        violationCode: `VIO-${curYear}-002`,
+        companyId: c2.id || '',
+        companyName: c2.name,
+        establishmentName: `${c2.name} - فرع جدة`,
+        branchName: 'فرع المنطقة الغربية',
+        category: 'حماية الأجور (نظام دفع الأجور وتأخير الرواتب)',
+        description: 'تأخر في رفع ملف الأجور لشهر يناير وتجاوز نسبة التزام حماية الأجور المحددة بنسبة 80%',
+        violationDate: `${curYear}-02-10`,
+        notificationDate: `${curYear}-02-12`,
+        decisionNumber: `DEC-${curYear}-7742`,
+        fineAmount: 10000,
+        riskLevel: 'High' as const,
+        status: 'Correction in Progress' as const,
+        assignedTo: 'مسؤول الامتثال',
+        deadline: `${curYear}-03-14`,
+        deadlineVerified: true,
+        notes: 'جاري مطابقة مخرجات مسير الرواتب بالبنوك المعتمدة وإرفاق المبررات في المنصة',
+        createdBy: 'system',
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        violationCode: `VIO-${curYear}-003`,
+        companyId: c1.id || '',
+        companyName: c1.name,
+        establishmentName: `${c1.name} - مركز العمليات`,
+        branchName: 'مستودع السلي',
+        category: 'السلامة والصحة المهنية (كود العمل والوقاية)',
+        description: 'عدم توفير وسائل الوقاية الشخصية للعاملين ومخالفة اشتراطات كود السلامة والصحة المهنية',
+        violationDate: `${curYear}-01-28`,
+        notificationDate: `${curYear}-02-01`,
+        decisionNumber: `DEC-${curYear}-6619`,
+        fineAmount: 5000,
+        riskLevel: 'Medium' as const,
+        status: 'Paid' as const,
+        assignedTo: 'مشرف السلامة والامتثال',
+        deadline: `${curYear}-02-28`,
+        deadlineVerified: true,
+        notes: 'تم تصحيح الملاحظات وسداد الغرامة عبر نظام سداد وإغلاق الملاحظة',
+        createdBy: 'system',
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    let count = 0;
+    for (const v of sampleViolations) {
+      await addDoc(collection(db, path), v);
+      count++;
+    }
+
+    return count;
+  } catch (error) {
+    console.warn('Sample violations seeding notice:', error);
+    return 0;
+  }
+}
+
 // ==========================================
 // VIOLATIONS
 // ==========================================

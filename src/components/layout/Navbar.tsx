@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole, ROLE_TRANSLATIONS } from '../../types';
 import {
@@ -23,6 +23,20 @@ export const Navbar: React.FC<NavbarProps> = ({
   setLang,
 }) => {
   const { currentUser, userProfile, effectiveRole, logout, switchSimulatedRole } = useAuth();
+  const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const toggleLanguage = () => {
     const nextLang = lang === 'ar' ? 'en' : 'ar';
@@ -83,10 +97,29 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Controls: Language, Role Simulation, User Profile, Logout */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Database indicator */}
-            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div
+              className={`hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs transition-colors ${
+                isOnline
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-amber-50 text-amber-700 border-amber-200'
+              }`}
+              title={
+                isOnline
+                  ? (lang === 'ar' ? 'متصل بقاعدة البيانات المركزية الفورية' : 'Connected to central live Firestore')
+                  : (lang === 'ar' ? 'وضع غير متصل - يتم حفظ التغييرات ومزامنتها تلقائياً' : 'Offline - Changes queued for automatic sync')
+              }
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                }`}
+              ></span>
               <Database className="w-3.5 h-3.5" />
-              <span>{lang === 'ar' ? 'فايربيس متصل' : 'Firebase Connected'}</span>
+              <span>
+                {isOnline
+                  ? (lang === 'ar' ? 'مزامنة مركزية حية' : 'Live Cloud Sync')
+                  : (lang === 'ar' ? 'غير متصل (حفظ مؤقت)' : 'Offline (Queued)')}
+              </span>
             </div>
 
             {/* Language Toggle */}

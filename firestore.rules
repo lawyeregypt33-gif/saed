@@ -48,9 +48,18 @@ service cloud.firestore {
     // Users collection
     match /users/{userId} {
       allow read: if isSignedIn();
-      // Allow user to write their own initial profile, or Admin to manage any profile
-      allow create: if isSignedIn() && (request.auth.uid == userId || isAdmin());
-      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      // Allow user to write their own initial profile without self-assigning Admin, or Admin to manage any profile
+      allow create: if isSignedIn() && (
+        (request.auth.uid == userId && (request.resource.data.role != 'Admin' || isBootstrappedAdmin())) ||
+        isAdmin()
+      );
+      // User can update their own profile fields but CANNOT escalate their role. Only Admin can change roles.
+      allow update: if isSignedIn() && (
+        (request.auth.uid == userId && (
+          (request.resource.data.role == resource.data.role || isBootstrappedAdmin())
+        )) ||
+        isAdmin()
+      );
       allow delete: if isAdmin();
     }
 
